@@ -18,7 +18,11 @@ builder.Services.Configure<WorkerOptions>(
 
 builder.Services.AddHostedService<Worker>();
 
-builder.Services.AddWindowsService();
+// Only add Windows service when NOT debugging
+if (!args.Contains("--console"))
+{
+    builder.Services.AddWindowsService();
+}
 
 var host = builder.Build();
 host.Run();
