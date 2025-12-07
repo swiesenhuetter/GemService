@@ -13,11 +13,14 @@
 	  <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
 	  <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
 	  <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+	  <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+
   </ItemGroup>
 
 	<ItemGroup>
 		<None Include="install.ps1" CopyToOutputDirectory="PreserveNewest" />
 		<None Include="uninstall.ps1" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 </Project>

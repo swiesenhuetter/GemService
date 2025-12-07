@@ -15,14 +15,17 @@ namespace GemService
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Worker started at: {time}", DateTimeOffset.Now);
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 if (_logger.IsEnabled(LogLevel.Information))
                 {
                     _logger.LogInformation("{Message}: {time}", _options.Message, DateTimeOffset.Now);
                 }
-                await Task.Delay(1000, stoppingToken);
+                await Task.Delay(_options.DelayMilliseconds, stoppingToken);
             }
+            _logger.LogInformation("Worker service stopping at: {time}", DateTimeOffset.Now);
         }
     }
 }
