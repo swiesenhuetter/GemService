@@ -91,9 +91,15 @@ namespace GemService
                 using var reader = new StreamReader(stream);
                 using var writer = new StreamWriter(stream) { AutoFlush = true };
 
-                string? message = await reader.ReadLineAsync(stoppingToken);
-                if (message != null)
+                while (client.Connected && !stoppingToken.IsCancellationRequested)
                 {
+
+                    string? message = await reader.ReadLineAsync(stoppingToken);
+                    if (message == null)
+                    {
+                        _logger.LogInformation("Client closed connection");
+                        break;
+                    }
                     _logger.LogInformation("Received TCP message: {message}", message);
                     await writer.WriteLineAsync($"ACK: {message}");
                 }
