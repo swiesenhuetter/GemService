@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Sockets;
 
@@ -22,16 +23,35 @@ namespace GemService
             // Start TCP communication server
             var tcpTask = RunTcpServer(stoppingToken);
 
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                if (_logger.IsEnabled(LogLevel.Information))
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    _logger.LogInformation("{Message}: {time}", _options.Message, DateTimeOffset.Now);
+                    if (_logger.IsEnabled(LogLevel.Information))
+                    {
+                        _logger.LogInformation("{Message}: {time}", _options.Message, DateTimeOffset.Now);
+                    }
+                    await Task.Delay(_options.DelayMilliseconds, stoppingToken);
                 }
-                await Task.Delay(_options.DelayMilliseconds, stoppingToken);
             }
-            
+            catch (OperationCanceledException)
+            {
+                // Expected during shutdown, not an error
+            }
+
             _logger.LogInformation("Worker service stopping at: {time}", DateTimeOffset.Now);
+
+            // Wait for TCP server to finish cleanup
+            try
+            {
+                await tcpTask;
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected during shutdown
+            }
+
+
         }
 
         private async Task RunTcpServer(CancellationToken stoppingToken)
@@ -47,6 +67,11 @@ namespace GemService
                     var client = await listener.AcceptTcpClientAsync(stoppingToken);
                     _ = HandleTcpClient(client, stoppingToken); // Fire and forget
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected during shutdown - not an error
+                _logger.LogInformation("TCP server shutting down gracefully");
             }
             catch (Exception ex)
             {
@@ -72,6 +97,11 @@ namespace GemService
                     _logger.LogInformation("Received TCP message: {message}", message);
                     await writer.WriteLineAsync($"ACK: {message}");
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected during shutdown - not an error
+                _logger.LogDebug("Client connection canceled during shutdown");
             }
             catch (Exception ex)
             {

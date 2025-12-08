@@ -8,9 +8,7 @@ Environment.SetEnvironmentVariable("APP_BASE_DIRECTORY", AppContext.BaseDirector
 
 builder.Services.AddSerilog((services, lc) => lc
 .ReadFrom.Configuration(builder.Configuration)
-.ReadFrom.Services(services)
-.MinimumLevel.Information()
-.WriteTo.Console());
+.ReadFrom.Services(services));
 
 builder.Services.Configure<WorkerOptions>(
     builder.Configuration.GetSection("WorkerOptions")
