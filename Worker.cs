@@ -29,17 +29,16 @@ namespace GemService
                 {
                     if (_logger.IsEnabled(LogLevel.Information))
                     {
-                        _logger.LogInformation("{Message}: {time}", _options.Message, DateTimeOffset.Now);
+                        _logger.LogDebug("{Message}: {time}", _options.Message, DateTimeOffset.Now);
                     }
                     await Task.Delay(_options.DelayMilliseconds, stoppingToken);
                 }
             }
             catch (OperationCanceledException)
             {
+                _logger.LogInformation("Worker service stopping at: {time}", DateTimeOffset.Now);
                 // Expected during shutdown, not an error
             }
-
-            _logger.LogInformation("Worker service stopping at: {time}", DateTimeOffset.Now);
 
             // Wait for TCP server to finish cleanup
             try
@@ -73,6 +72,10 @@ namespace GemService
                 // Expected during shutdown - not an error
                 _logger.LogInformation("TCP server shutting down gracefully");
             }
+            catch (EndOfStreamException)
+            {
+                _logger.LogError("Server: TCP client disconnected");
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "TCP server error");
@@ -93,21 +96,37 @@ namespace GemService
 
                 while (client.Connected && !stoppingToken.IsCancellationRequested)
                 {
+                    var lengthBuffer = new byte[4];
+                    await stream.ReadExactlyAsync(lengthBuffer, 0, 4, stoppingToken);
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(lengthBuffer);
+                    }
 
-                    string? message = await reader.ReadLineAsync(stoppingToken);
-                    if (message == null)
+                    int messageLength = BitConverter.ToInt32(lengthBuffer, 0);
+
+                    var msgBuffer = new byte[messageLength];
+                    await stream.ReadExactlyAsync(msgBuffer, 0, messageLength, stoppingToken);
+                    
+                    string msg = System.Text.Encoding.UTF8.GetString(msgBuffer);
+
+                    if (msg == null)
                     {
                         _logger.LogInformation("Client closed connection");
                         break;
                     }
-                    _logger.LogInformation("Received TCP message: {message}", message);
-                    await writer.WriteLineAsync($"ACK: {message}");
+                    _logger.LogInformation("Received TCP message: {msg}", msg);
+                    // await writer.WriteLineAsync($"ACK: {msg}");
                 }
             }
             catch (OperationCanceledException)
             {
                 // Expected during shutdown - not an error
                 _logger.LogDebug("Client connection canceled during shutdown");
+            }
+            catch (EndOfStreamException) 
+            {
+                _logger.LogError("Handler: TCP client disconnected");
             }
             catch (Exception ex)
             {
