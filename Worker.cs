@@ -3,24 +3,48 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.Sockets;
 
+using Insphere.Connectivity.Application.SecsToHost;
+
 namespace GemService
 {
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
         private readonly WorkerOptions _options;
+        private GEMController _gem_ctrl;
 
         public Worker(ILogger<Worker> logger, IOptions<WorkerOptions> options)
         {
             _logger = logger;
             _options = options.Value;
+            _gem_ctrl = new GEMController();
         }
+
+        private void InitGemController()
+        {
+            try
+            {
+                _gem_ctrl.Initialize("EulithaPhableX.xml", @"C:\Temp");
+            }
+            catch (FileNotFoundException ex)
+            {
+                _logger.LogError(ex, "GEM Controller initialization error: File not found");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GEM Controller initialization error");
+                throw;
+            }
+          }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Worker started at: {time}", DateTimeOffset.Now);
 
-            // Start TCP communication server
+            InitGemController();
+
+            // Start TCP  communication server
             var tcpTask = RunTcpServer(stoppingToken);
 
             try
@@ -116,7 +140,8 @@ namespace GemService
                         break;
                     }
                     _logger.LogInformation("Received TCP message: {msg}", msg);
-                    // await writer.WriteLineAsync($"ACK: {msg}");
+                    char[] four_bytes = new char[] { 'A', 'C', 'K', '\0' };
+                    await writer.WriteAsync(four_bytes, 0, 4);
                 }
             }
             catch (OperationCanceledException)

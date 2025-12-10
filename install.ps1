@@ -21,7 +21,7 @@ if ($existingService) {
 
 # Publish the application
 Write-Host "Publishing application..." -ForegroundColor Cyan
-dotnet publish -c Release -o $InstallPath --self-contained false
+dotnet publish -c Release -r win-x64 -o $InstallPath --self-contained false
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Publish failed!" -ForegroundColor Red

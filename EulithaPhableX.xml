@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Equipment xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" persistence="true" asciiEncoding="Standard" schemaVersion="1.0.4" schemaTemplate="GEM30">
+  <License licenseId="" licensePath="" />
+  <Nameable id="MyEquipment" description="Eulitha Machine" locator="To be described" alias="Phable X" make="Eulitha AG" model="PhableX" softwareRev="1.0.1" />
+  <GemConnection protocol="Hsms" defaultCommunicationState="Enabled" defaultControlState="Online" defaultOnlineSubState="Remote" defaultOnlineFailState="HostOffline" deviceId="0" multipleOpen="false" maxOpenTransactions="10">
+    <HSMS connectionMode="Passive" linktestInterval="60" localIPAddress="127.0.0.1" localPortNumber="5000" remoteIPAddress="127.0.0.1" remotePortNumber="6000" T3Timeout="45" T5Timeout="10" T6Timeout="5" T7Timeout="10" T8Timeout="5" />
+    <RS232 commPort="1" baudRate="9600" retry="3" t1="1" t2="10" t3="30" t4="10" linktestInterval="60" />
+  </GemConnection>
+  <SecsItemFormats ackc5="Binary" ackc7="Binary" ackc7a="U1" ackc10="Binary" alid="U4" alcd="Binary" altx="Ascii" aled="Binary" attrid="Ascii" ccode="U2" ceid="U4" cpname="Ascii" dataid="U4" dsper="Ascii" errw7="Ascii" loc="Binary" mdln="Ascii" mid="Ascii" objid="Ascii" objspec="Ascii" objtype="Ascii" ppbody="Binary" ppid="Ascii" rcmd="Ascii" repgsz="U4" rptid="U4" seqnum="U2" softrev="Ascii" text="Ascii" tid="Binary" totsmp="U4" trid="U4" svid="U4" ecid="U4" ddid="U4" errcode="U1" opid="U1" length="U4" cmda="U1" ecmin="U4" ecmax="U4" ecdef="Ascii" idtyp="Binary" fnloc="U2" ffrot="U2" orloc="Binary" rpsel="U1" dutms="Ascii" xdies="U4" ydies="U4" rowct="U4" colct="U4" nulbc_binlt_bcequ="U1" prdct="U1" praxi="Binary" smpln="U4" mlcl="U8" refp="I2" commack="Binary" onlack="Binary" oflack="Binary" tiaack="Binary" tiack="Binary" drack="Binary" lrack="Binary" erack="Binary" hcack="Binary" cpack="Binary" />
+  <Logger logLevel="Info" messageLengthLimit="200000" rolloverSize="10000000" logAging="15" />
+  <Clock timeFormat="yyyymmddhhmmss" autoTimeSet="true" />
+  <RemoteCommand allowLocalMode="false">
+    <S2F21 opcPulseTimeout="0">
+      <S2F21Command name="100" logicalName="START" description=" " />
+      <S2F21Command name="101" logicalName="PAUSE" description=" " />
+      <S2F21Command name="102" logicalName="STOP" description=" " />
+      <S2F21Command name="103" logicalName="PP-SELECT" description=" " />
+      <S2F21Command name="104" logicalName="RESUME" description=" " />
+      <S2F21Command name="105" logicalName="ABORT" description=" " />
+      <S2F21Command name="106" logicalName="ACTIVATESIREN" description=" " />
+    </S2F21>
+    <S2F41 opcPulseTimeout="0">
+      <S2F41Command tag=" " name="StartLot" logicalName="StartLot" description=" ">
+        <CommandParameter tag=" " name="LOT_ID" logicalName="LOT_ID" description=" " parameterType="Ascii" />
+        <CommandParameter tag=" " name="QUANTITY" logicalName="QUANTITY" description=" " parameterType="U4" />
+      </S2F41Command>
+      <S2F41Command tag=" " name="VERIFY_RECIPE" logicalName="VERIFY_RECIPE" description=" ">
+        <CommandParameter tag=" " name="RecipeName" logicalName="RecipeName" description="File name in recipes folder include extension (.rcp)" parameterType="Ascii" />
+      </S2F41Command>
+    </S2F41>
+    <S2F49>
+      <S2F49Command tag=" " name="START_JOB" logicalName="START_JOB" description=" ">
+        <CommandParameter tag=" " name="EQPID" logicalName="EQPID" description=" " parameterType="Ascii" />
+        <CommandParameter tag=" " name="JOBINFO" logicalName="JOBINFO" description=" " parameterType="List" />
+      </S2F49Command>
+    </S2F49>
+  </RemoteCommand>
+  <StatusVariables opcScanRate="0" opcPulseTimeout="0">
+    <SVID id="1001" valueType="List" logicalName="AlarmsEnabled" description=" " value="" eventTrigger=" " isArray="false" tag=" " units="" />
+    <SVID id="1002" valueType="List" logicalName="AlarmsSet" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1003" valueType="Ascii" logicalName="Clock" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1004" valueType="U4" logicalName="ControlState" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1005" valueType="List" logicalName="EventsEnabled" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1006" valueType="Ascii" logicalName="PPExecName" description=" " value="PPExecName" eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1007" valueType="U1" logicalName="PreviousProcessState" description=" " value="0" eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1008" valueType="U1" logicalName="ProcessState" description=" " value="0" eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1010" valueType="U4" logicalName="SpoolCountActual" description=" " eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1011" valueType="U4" logicalName="SpoolCountTotal" description=" " eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1012" valueType="Ascii" logicalName="SpoolFullTime" description=" " eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1013" valueType="Ascii" logicalName="SpoolStartTime" description=" " eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1014" valueType="U4" logicalName="SpoolState" description=" " eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1015" valueType="U4" logicalName="SpoolSubstate" description=" " eventTrigger=" " isArray="false" tag=" " />
+    <SVID id="1018" valueType="Ascii" logicalName="FrontCasetteID" description="When front cassette is mounted, RFID id reader result is sent in event report 11 to host" value="" eventTrigger=" " isArray="false" tag=" " units="" />
+    <SVID id="1019" valueType="Ascii" logicalName="BackCasetteID" description="When back cassette is mounted, RFID id reader result is sent in event report 12 to host" value="" eventTrigger="" isArray="false" tag=" " units="" />
+    <SVID id="1020" valueType="Ascii" logicalName="LightTowerColor" description="to be done" value="" eventTrigger="" isArray="false" tag=" " units="" />
+    <SVID id="1022" valueType="U4" logicalName="BatchStatus" description="can be idle, active, error, done" value="" eventTrigger="" isArray="false" tag=" " units="" />
+    <SVID id="1023" valueType="Ascii" logicalName="ToolStatus" description="PhableX machine status (content to be defined)" value="Status Unknown" eventTrigger="" isArray="false" tag=" " units="" />
+    <SVID id="1024" valueType="List" logicalName="FrontCassetteSlots" description="List of (usually 25) booleans True for slots with wafers, False for empty slots" value="" eventTrigger=" " isArray="false" tag=" " units="" />
+    <SVID id="1025" valueType="List" logicalName="BackCassetteSlots" description=" List of (usually 25) booleans True for slots with wafers, False for empty slots" value="" eventTrigger=" " isArray="false" tag=" " units="" />
+    <SVID id="1026" valueType="Boolean" logicalName="LaserOnIndicator" description="True: emitting laser beam" value="" eventTrigger=" " isArray="false" tag=" " units="" />
+  </StatusVariables>
+  <EquipmentConstants opcScanRate="0" opcPulseTimeout="0" suppressECMinMaxType="true">
+    <ECID id="2000" valueType="U2" logicalName="EstablishCommunicationsTimeout" description=" " value="2" eventTrigger=" " isArray="false" tag=" " min="0" max="100" units="Test" />
+    <ECID id="2001" valueType="U4" logicalName="MaxSpoolTransmit" description=" " value="100" eventTrigger=" " isArray="false" tag=" " min="0" max="1000" />
+    <ECID id="2003" valueType="Boolean" logicalName="OverWriteSpool" description=" " value="false" eventTrigger=" " isArray="false" tag=" " min="" max="" />
+    <ECID id="2012" valueType="U4" logicalName="MaxSpoolCapacity" description=" " value="200" eventTrigger=" " isArray="false" tag=" " min="0" max="1000" defaultValue="200" />
+    <ECID id="2013" valueType="Boolean" logicalName="SpoolEnabled" description=" " value="false" eventTrigger=" " isArray="false" tag=" " min="0" max="0" defaultValue="false" />
+    <ECID id="2014" valueType="U2" logicalName="TimeFormat" description=" " value="0" eventTrigger=" " isArray="false" tag=" " min="0" max="1" units="" />
+  </EquipmentConstants>
+  <DataVariables opcScanRate="0" opcPulseTimeout="0">
+    <DVID id="3001" valueType="U4" logicalName="EventLimit" description=" " value="0" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3002" valueType="U4" logicalName="LimitVariable" description=" " value="0" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3003" valueType="Ascii" logicalName="PPChangeName" description=" " value="PPChangeName" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3004" valueType="U2" logicalName="PPChangeStatus" description=" " value="1" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3005" valueType="Binary" logicalName="TransitionType" description=" " value="0" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3015" valueType="U4" logicalName="AlarmID" description=" " eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3016" valueType="U4" logicalName="ECChangedID" description=" " eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3017" valueType="Ascii" logicalName="LotId" description="LotId Description" value="DEFAULT123" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3019" valueType="U4" logicalName="LotProcessedQty" description=" " value="0" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3020" valueType="Ascii" logicalName="CarrierID" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3021" valueType="Ascii" logicalName="FrontCassetteID" description="scanned RFID id of front cassette" value="" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3022" valueType="Ascii" logicalName="BackCassetteID" description="scanned RFID id of back cassette" value="" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3023" valueType="Ascii" logicalName="ErrorMessageText" description="error message text from PhableX" value="" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3024" valueType="U4" logicalName="CassetteCapacity" description="Number of wafers in cassettes" value="25" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3025" valueType="U8" logicalName="OriginSlot" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3026" valueType="U8" logicalName="DestinationSlot" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3027" valueType="Ascii" logicalName="ScannedWaferId" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+    <DVID id="3028" valueType="Ascii" logicalName="StationId" description=" " value="" eventTrigger=" " isArray="false" tag=" " />
+  </DataVariables>
+  <DataCollections opcScanRate="0" opcPulseTimeout="0" useAnnotatedEvent="false" allowUnknownCEID="false" opcEventSet="1" opcEventClear="0">
+    <RPTIDs>
+      <RPTID id="1" logicalName="ControlReport">
+        <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        <ReportVariable id="1004" varType="StatusVariable" logicalName="ControlState" />
+      </RPTID>
+      <RPTID id="2" logicalName="ProcessingReport">
+        <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        <ReportVariable id="1007" varType="StatusVariable" logicalName="PreviousProcessState" />
+      </RPTID>
+      <RPTID id="4" logicalName="ProcessingStateChangedReport">
+        <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        <ReportVariable id="1007" varType="StatusVariable" logicalName="PreviousProcessState" />
+        <ReportVariable id="1008" varType="StatusVariable" logicalName="ProcessState" />
+      </RPTID>
+      <RPTID id="5" logicalName="ECChangedReport">
+        <ReportVariable id="3016" varType="DataVariable" logicalName="ECChangedID" />
+      </RPTID>
+      <RPTID id="6" logicalName="PPChangedReport">
+        <ReportVariable id="3003" varType="DataVariable" logicalName="PPChangeName" />
+        <ReportVariable id="3004" varType="DataVariable" logicalName="PPChangeStatus" />
+      </RPTID>
+      <RPTID id="7" logicalName="PPSelectedReport">
+        <ReportVariable id="1006" varType="StatusVariable" logicalName="PPExecName" />
+      </RPTID>
+      <RPTID id="8" logicalName="AlarmEventReport">
+        <ReportVariable id="3015" varType="DataVariable" logicalName="AlarmID" />
+        <ReportVariable id="1002" varType="StatusVariable" logicalName="AlarmsSet" />
+        <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+      </RPTID>
+      <RPTID id="9" logicalName="LotStartReport">
+        <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        <ReportVariable id="3017" varType="DataVariable" logicalName="LotId" />
+      </RPTID>
+      <RPTID id="10" logicalName="LotCompletedReport">
+        <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        <ReportVariable id="3017" varType="DataVariable" logicalName="LotId" />
+        <ReportVariable id="3019" varType="DataVariable" logicalName="LotProcessedQty" />
+        <ReportVariable id="1022" varType="StatusVariable" logicalName="BatchStatus" />
+      </RPTID>
+      <RPTID id="11" logicalName="FrontCassetteLoadedReport">
+        <ReportVariable id="3021" varType="DataVariable" logicalName="FrontCassetteID" />
+      </RPTID>
+      <RPTID id="12" logicalName="BackCassetteLoadedReport">
+        <ReportVariable id="3022" varType="DataVariable" logicalName="BackCassetteID" />
+      </RPTID>
+      <RPTID id="13" logicalName="ErrorReport">
+        <ReportVariable id="3023" varType="DataVariable" logicalName="ErrorMessageText" />
+      </RPTID>
+      <RPTID id="14" logicalName="MachineStatusReport">
+        <ReportVariable id="1023" varType="StatusVariable" logicalName="ToolStatus" />
+      </RPTID>
+      <RPTID id="15" logicalName="FrontCassetteScanReport">
+        <ReportVariable id="1024" varType="StatusVariable" logicalName="FrontCassetteSlots" />
+      </RPTID>
+      <RPTID id="16" logicalName="BackCassetteScanReport">
+        <ReportVariable id="1025" varType="StatusVariable" logicalName="BackCassetteSlots" />
+      </RPTID>
+      <RPTID id="17" logicalName="WaferAtStationReport">
+        <ReportVariable id="3028" varType="DataVariable" logicalName="StationId" />
+        <ReportVariable id="3027" varType="DataVariable" logicalName="ScannedWaferId" />
+        <ReportVariable id="3025" varType="DataVariable" logicalName="OriginSlot" />
+        <ReportVariable id="3026" varType="DataVariable" logicalName="DestinationSlot" />
+      </RPTID>
+    </RPTIDs>
+    <CEIDs>
+      <CEID id="1" logicalName="EquipmentOFFLINE" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="1" logicalName="ControlReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="1004" varType="StatusVariable" logicalName="ControlState" />
+        </RPTID>
+      </CEID>
+      <CEID id="2" logicalName="ControlStateLOCAL" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="1" logicalName="ControlReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="1004" varType="StatusVariable" logicalName="ControlState" />
+        </RPTID>
+      </CEID>
+      <CEID id="3" logicalName="ControlStateREMOTE" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="1" logicalName="ControlReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="1004" varType="StatusVariable" logicalName="ControlState" />
+        </RPTID>
+      </CEID>
+      <CEID id="4" logicalName="ProcessingStarted" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="2" logicalName="ProcessingReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="1007" varType="StatusVariable" logicalName="PreviousProcessState" />
+        </RPTID>
+      </CEID>
+      <CEID id="5" logicalName="ProcessingCompleted" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="2" logicalName="ProcessingReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="1007" varType="StatusVariable" logicalName="PreviousProcessState" />
+        </RPTID>
+      </CEID>
+      <CEID id="6" logicalName="ProcessingStopped" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="2" logicalName="ProcessingReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="1007" varType="StatusVariable" logicalName="PreviousProcessState" />
+        </RPTID>
+      </CEID>
+      <CEID id="7" logicalName="ProcessingStateChanged" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="4" logicalName="ProcessingStateChangedReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="1007" varType="StatusVariable" logicalName="PreviousProcessState" />
+          <ReportVariable id="1008" varType="StatusVariable" logicalName="ProcessState" />
+        </RPTID>
+      </CEID>
+      <CEID id="8" logicalName="EquipmentConstantChanged" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="5" logicalName="ECChangedReport">
+          <ReportVariable id="3016" varType="DataVariable" logicalName="ECChangedID" />
+        </RPTID>
+      </CEID>
+      <CEID id="9" logicalName="ProcessProgramChanged" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="6" logicalName="PPChangedReport">
+          <ReportVariable id="3003" varType="DataVariable" logicalName="PPChangeName" />
+          <ReportVariable id="3004" varType="DataVariable" logicalName="PPChangeStatus" />
+        </RPTID>
+      </CEID>
+      <CEID id="1000" logicalName="ProcessProgramSelected" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="7" logicalName="PPSelectedReport">
+          <ReportVariable id="1006" varType="StatusVariable" logicalName="PPExecName" />
+        </RPTID>
+      </CEID>
+      <CEID id="1006" logicalName="SpoolingActivated" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false" />
+      <CEID id="1007" logicalName="SpoolingDeactivated" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false" />
+      <CEID id="1008" logicalName="SpoolingFailed" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false" />
+      <CEID id="1009" logicalName="LotStarted" description="LotStarted description" enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="9" logicalName="LotStartReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="3017" varType="DataVariable" logicalName="LotId" />
+        </RPTID>
+      </CEID>
+      <CEID id="100001" logicalName="__SYSTEM__100001__ALARMSET" description="Alarm Set: Interlock Active" enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="8" logicalName="AlarmEventReport">
+          <ReportVariable id="3015" varType="DataVariable" logicalName="AlarmID" />
+          <ReportVariable id="1002" varType="StatusVariable" logicalName="AlarmsSet" />
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        </RPTID>
+      </CEID>
+      <CEID id="200001" logicalName="__SYSTEM__200001__ALARMCLEAR" description="Alarm Clear: Interlock Active" enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="8" logicalName="AlarmEventReport">
+          <ReportVariable id="3015" varType="DataVariable" logicalName="AlarmID" />
+          <ReportVariable id="1002" varType="StatusVariable" logicalName="AlarmsSet" />
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        </RPTID>
+      </CEID>
+      <CEID id="1010" logicalName="LotCompleted" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="10" logicalName="LotCompletedReport">
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+          <ReportVariable id="3017" varType="DataVariable" logicalName="LotId" />
+          <ReportVariable id="3019" varType="DataVariable" logicalName="LotProcessedQty" />
+          <ReportVariable id="1022" varType="StatusVariable" logicalName="BatchStatus" />
+        </RPTID>
+      </CEID>
+      <CEID id="1011" logicalName="FrontCassetteLoaded" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="11" logicalName="FrontCassetteLoadedReport">
+          <ReportVariable id="3021" varType="DataVariable" logicalName="FrontCassetteID" />
+        </RPTID>
+      </CEID>
+      <CEID id="1012" logicalName="BackCassetteLoaded" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="12" logicalName="BackCassetteLoadedReport">
+          <ReportVariable id="3022" varType="DataVariable" logicalName="BackCassetteID" />
+        </RPTID>
+      </CEID>
+      <CEID id="100003" logicalName="__SYSTEM__100003__ALARMSET" description="Alarm Set: ErrorMessage" enabled="false" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="8" logicalName="AlarmEventReport">
+          <ReportVariable id="3015" varType="DataVariable" logicalName="AlarmID" />
+          <ReportVariable id="1002" varType="StatusVariable" logicalName="AlarmsSet" />
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        </RPTID>
+      </CEID>
+      <CEID id="200003" logicalName="__SYSTEM__200003__ALARMCLEAR" description="Alarm Clear: ErrorMessage" enabled="false" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="8" logicalName="AlarmEventReport">
+          <ReportVariable id="3015" varType="DataVariable" logicalName="AlarmID" />
+          <ReportVariable id="1002" varType="StatusVariable" logicalName="AlarmsSet" />
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        </RPTID>
+      </CEID>
+      <CEID id="1014" logicalName="GenericError" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="13" logicalName="ErrorReport">
+          <ReportVariable id="3023" varType="DataVariable" logicalName="ErrorMessageText" />
+        </RPTID>
+      </CEID>
+      <CEID id="1015" logicalName="MachineStatusChange" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="14" logicalName="MachineStatusReport">
+          <ReportVariable id="1023" varType="StatusVariable" logicalName="ToolStatus" />
+        </RPTID>
+      </CEID>
+      <CEID id="1016" logicalName="FrontCassetteScanned" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="15" logicalName="FrontCassetteScanReport">
+          <ReportVariable id="1024" varType="StatusVariable" logicalName="FrontCassetteSlots" />
+        </RPTID>
+      </CEID>
+      <CEID id="1017" logicalName="BackCassetteScanned" description=" " enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="16" logicalName="BackCassetteScanReport">
+          <ReportVariable id="1025" varType="StatusVariable" logicalName="BackCassetteSlots" />
+        </RPTID>
+      </CEID>
+      <CEID id="100004" logicalName="__SYSTEM__100004__ALARMSET" description="Alarm Set: LaserOn" enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="8" logicalName="AlarmEventReport">
+          <ReportVariable id="3015" varType="DataVariable" logicalName="AlarmID" />
+          <ReportVariable id="1002" varType="StatusVariable" logicalName="AlarmsSet" />
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        </RPTID>
+      </CEID>
+      <CEID id="200004" logicalName="__SYSTEM__200004__ALARMCLEAR" description="Alarm Clear: LaserOn" enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="8" logicalName="AlarmEventReport">
+          <ReportVariable id="3015" varType="DataVariable" logicalName="AlarmID" />
+          <ReportVariable id="1002" varType="StatusVariable" logicalName="AlarmsSet" />
+          <ReportVariable id="1003" varType="StatusVariable" logicalName="Clock" />
+        </RPTID>
+      </CEID>
+      <CEID id="1018" logicalName="WaferArrivedAtStation" description="New wafer arrived at new station in the machine" enabled="true" opcTriggerPattern="*..1" opcAutoReset="false">
+        <RPTID id="17" logicalName="WaferAtStationReport">
+          <ReportVariable id="3028" varType="DataVariable" logicalName="StationId" />
+          <ReportVariable id="3027" varType="DataVariable" logicalName="ScannedWaferId" />
+          <ReportVariable id="3025" varType="DataVariable" logicalName="OriginSlot" />
+          <ReportVariable id="3026" varType="DataVariable" logicalName="DestinationSlot" />
+        </RPTID>
+      </CEID>
+    </CEIDs>
+  </DataCollections>
+  <Alarms opcScanRate="0" opcPulseTimeout="0" opcAlarmSet="1" opcAlarmClear="0">
+    <ALID id="2" logicalName="Interlock Active" description="door opened or emergency button pressed" category="PersonalSafety" enabled="true" eventSet="100001" eventClear="200001" opcBitIndex="0" tag=" " />
+    <ALID id="4" logicalName="ErrorMessage" description="Generic error message (contains text)" category="ParameterControlError" enabled="false" eventSet="100003" eventClear="200003" opcBitIndex="0" tag=" " />
+    <ALID id="5" logicalName="LaserOn" description="Laser is on!" category="PersonalSafety" enabled="true" eventSet="100004" eventClear="200004" opcBitIndex="0" tag=" " />
+  </Alarms>
+  <ProcessProgram autoHandleS7F17="false" autoHandleS7F19="false" supportS7Unformatted="false" supportS21SingleUnformatted="false" supportS21MultipleUnformatted="false" supportS7Formatted="false" sizePerBlock="0" s21ItemPartLimit="12428800" />
+  <Persistence SerializationFormatter="SMLFormatter" E30.General="true" E30.StatusVariables="false" E30.EquipmentConstants="false" E30.DataVariables="false" E30.Reports="false" E30.Events="false" E30.Alarms="false" E87.LoadPortLocations="false" E87.Carriers="false" E90.SubstrateLocations="false" E90.Substrates="false" E40.ProcessJobs="false" E94.ControlJobs="false" />
+  <MsgOptionalReply S2F21="true" S5F1="true" S6F1="false" S10F1="true" />
+  <OPCServers opcType="OpcDA" />
+</Equipment>
