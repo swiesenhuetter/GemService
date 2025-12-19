@@ -4,6 +4,9 @@ using System.Net;
 using System.Net.Sockets;
 
 using Insphere.Connectivity.Application.SecsToHost;
+using Insphere.Connectivity.Application.Common;
+using Insphere.Connectivity.Application.MessageServices;
+using Insphere.Connectivity.Common;
 
 namespace GemService
 {
@@ -12,19 +15,51 @@ namespace GemService
         private readonly ILogger<Worker> _logger;
         private readonly WorkerOptions _options;
         private GEMController _gem_ctrl;
+        private MessageServiceManager? _serviceManager;
 
         public Worker(ILogger<Worker> logger, IOptions<WorkerOptions> options)
         {
             _logger = logger;
             _options = options.Value;
             _gem_ctrl = new GEMController();
+
+            // Copy EulithaPhableX.xml to eulitha folder : C:\ProgramData\Eulitha
+            CopyConfigurationFile();
+
+            if (SynchronizationContext.Current != null)
+            {
+                // Synchronize the GUI Thread
+                _gem_ctrl.UISynchronizationContext = SynchronizationContext.Current;
+            }
+            else
+            {
+                _gem_ctrl.UISynchronizationContext = new SynchronizationContext();
+            }
+
+            // Subscribe to the Communication state transition event
+            _gem_ctrl.CommunicationStateChanged += OnCommunicationStateChanged;
+
+            // Subscribe to the GEM control state transition event
+            _gem_ctrl.ControlStateChanged += OnControlStateChanged;
+
+            // Subscribe to the GEM Host Command S2F41.
+            _gem_ctrl.HostCommandReceived += OnHostCommandReceived;
+
+
+            _gem_ctrl.RemoteCommandReceived += OnRemoteCommandReceived;
+
+            _gem_ctrl.PrimaryMessageIn += OnPrimaryMessage;
+
+            InitGemController();
         }
 
         private void InitGemController()
         {
             try
             {
-                _gem_ctrl.Initialize("EulithaPhableX.xml", @"C:\Temp");
+                var cfg_file = Path.Combine(_options.EulithaFolder, _options.SecsGemConfigFile);
+                _gem_ctrl.Initialize(cfg_file, @"C:\Temp");
+                _serviceManager = _gem_ctrl.Services;
             }
             catch (FileNotFoundException ex)
             {
@@ -38,11 +73,44 @@ namespace GemService
             }
           }
 
+        private void OnPrimaryMessage(object sender, SECsPrimaryInEventArgs e)
+        {             // Log the received primary message
+            _logger.LogInformation("Received Primary Message: {message}", e.ToString());
+        }
+
+
+        private void OnCommunicationStateChanged(object sender, SECsEventArgs e)
+        {
+            // Update the txtCommunicationStatus with the latest Communication State
+            string comm_state = _gem_ctrl.CommunicationState.ToString().ToUpper();
+            _logger.LogInformation("received : {comm_state}", comm_state);
+        }
+
+        private void OnControlStateChanged(object sender, SECsEventArgs e)
+        {
+            // Update the txtControlState with the latest Control State
+            string ctrl_state = _gem_ctrl.ControlState.ToString().ToUpper();
+            _logger.LogInformation("received : {ctrl_state}", ctrl_state);
+        }
+
+        private void OnRemoteCommandReceived(object sender, RemoteCommandEventArgs<CMDA> e)
+        {
+            string cmd = e.LogicalName;
+
+            e.SetReply(CMDA.Accepted);
+        }
+
+        private void OnHostCommandReceived(Object sender, HostCommandEventArgs<HCACK> e)
+        {
+            string cmd = e.LogicalName;
+            
+            _logger.LogInformation("received : {cmd}", cmd);
+            e.SetReply(HCACK.Accepted);
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Worker started at: {time}", DateTimeOffset.Now);
-
-            InitGemController();
 
             // Start TCP  communication server
             var tcpTask = RunTcpServer(stoppingToken);
@@ -109,6 +177,31 @@ namespace GemService
                 listener.Stop();
             }
         }
+
+
+        private void CopyConfigurationFile()
+        {
+            try
+            {
+                var sourceFile = Path.Combine(AppContext.BaseDirectory, _options.SecsGemConfigFile);
+                var destinationFolder = _options.EulithaFolder;
+                var destinationFile = Path.Combine(destinationFolder, _options.SecsGemConfigFile);
+
+                // Create destination directory if it doesn't exist
+                Directory.CreateDirectory(destinationFolder);
+
+                // Copy file (overwrite if exists)
+                File.Copy(sourceFile, destinationFile, overwrite: true);
+
+                Console.WriteLine($"Successfully copied EulithaPhableX.xml to {destinationFolder}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error copying configuration file: {ex.Message}");
+                // Consider whether you want to throw or just log - depends on if this is critical
+            }
+        }
+
 
         private async Task HandleTcpClient(TcpClient client, CancellationToken stoppingToken)
         {

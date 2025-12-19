@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Equipment xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" persistence="true" asciiEncoding="Standard" schemaVersion="1.0.4" schemaTemplate="GEM30">
+<Equipment xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" persistence="true" asciiEncoding="Standard" schemaVersion="1.0.4" schemaTemplate="GEM30" productInfo="SecsToHost.Net Compatible">
   <License licenseId="" licensePath="" />
   <Nameable id="MyEquipment" description="Eulitha Machine" locator="To be described" alias="Phable X" make="Eulitha AG" model="PhableX" softwareRev="1.0.1" />
   <GemConnection protocol="Hsms" defaultCommunicationState="Enabled" defaultControlState="Online" defaultOnlineSubState="Remote" defaultOnlineFailState="HostOffline" deviceId="0" multipleOpen="false" maxOpenTransactions="10">
     <HSMS connectionMode="Passive" linktestInterval="60" localIPAddress="127.0.0.1" localPortNumber="5000" remoteIPAddress="127.0.0.1" remotePortNumber="6000" T3Timeout="45" T5Timeout="10" T6Timeout="5" T7Timeout="10" T8Timeout="5" />
-    <RS232 commPort="1" baudRate="9600" retry="3" t1="1" t2="10" t3="30" t4="10" linktestInterval="60" />
+    <RS232 commPort="1" baudRate="9600" retry="3" t1="1" t2="10" t3="30" t4="10" linktestInterval="60" T1Timeout="0.5" T2Timeout="10" T3Timeout="45" T4Timeout="45" />
   </GemConnection>
-  <SecsItemFormats ackc5="Binary" ackc7="Binary" ackc7a="U1" ackc10="Binary" alid="U4" alcd="Binary" altx="Ascii" aled="Binary" attrid="Ascii" ccode="U2" ceid="U4" cpname="Ascii" dataid="U4" dsper="Ascii" errw7="Ascii" loc="Binary" mdln="Ascii" mid="Ascii" objid="Ascii" objspec="Ascii" objtype="Ascii" ppbody="Binary" ppid="Ascii" rcmd="Ascii" repgsz="U4" rptid="U4" seqnum="U2" softrev="Ascii" text="Ascii" tid="Binary" totsmp="U4" trid="U4" svid="U4" ecid="U4" ddid="U4" errcode="U1" opid="U1" length="U4" cmda="U1" ecmin="U4" ecmax="U4" ecdef="Ascii" idtyp="Binary" fnloc="U2" ffrot="U2" orloc="Binary" rpsel="U1" dutms="Ascii" xdies="U4" ydies="U4" rowct="U4" colct="U4" nulbc_binlt_bcequ="U1" prdct="U1" praxi="Binary" smpln="U4" mlcl="U8" refp="I2" commack="Binary" onlack="Binary" oflack="Binary" tiaack="Binary" tiack="Binary" drack="Binary" lrack="Binary" erack="Binary" hcack="Binary" cpack="Binary" />
+  <SecsItemFormats ackc5="Binary" ackc7="Binary" ackc7a="U1" ackc10="Binary" alid="U4" alcd="Binary" altx="Ascii" aled="Binary" attrid="Ascii" ccode="U2" ceid="U4" cpname="Ascii" dataid="U4" dsper="Ascii" errw7="Ascii" loc="Binary" mdln="Ascii" mid="Ascii" objid="Ascii" objspec="Ascii" objtype="Ascii" ppbody="Binary" ppid="Ascii" rcmd="Ascii" repgsz="U4" rptid="U4" seqnum="U2" softrev="Ascii" text="Ascii" tid="Binary" totsmp="U4" trid="U4" svid="U4" ecid="U4" ddid="U4" errcode="U1" opid="U1" length="U4" cmda="U1" ecmin="U4" ecmax="U4" ecdef="Ascii" idtyp="Binary" fnloc="U2" ffrot="U2" orloc="Binary" rpsel="U1" dutms="Ascii" xdies="U4" ydies="U4" rowct="U4" colct="U4" nulbc_binlt_bcequ="U1" prdct="U1" praxi="Binary" smpln="U4" mlcl="U8" refp="I2" commack="Binary" onlack="Binary" oflack="Binary" tiaack="Binary" tiack="Binary" drack="Binary" lrack="Binary" erack="Binary" hcack="Binary" cpack="Binary" itemAck="Binary" />
   <Logger logLevel="Info" messageLengthLimit="200000" rolloverSize="10000000" logAging="15" />
   <Clock timeFormat="yyyymmddhhmmss" autoTimeSet="true" />
   <RemoteCommand allowLocalMode="false">
     <S2F21 opcPulseTimeout="0">
-      <S2F21Command name="100" logicalName="START" description=" " />
-      <S2F21Command name="101" logicalName="PAUSE" description=" " />
-      <S2F21Command name="102" logicalName="STOP" description=" " />
-      <S2F21Command name="103" logicalName="PP-SELECT" description=" " />
-      <S2F21Command name="104" logicalName="RESUME" description=" " />
-      <S2F21Command name="105" logicalName="ABORT" description=" " />
-      <S2F21Command name="106" logicalName="ACTIVATESIREN" description=" " />
+      <S2F21Command name="100" logicalName="START" description=" " tag=" " />
+      <S2F21Command name="101" logicalName="PAUSE" description=" " tag=" " />
+      <S2F21Command name="102" logicalName="STOP" description=" " tag=" " />
+      <S2F21Command name="103" logicalName="PP-SELECT" description=" " tag=" " />
+      <S2F21Command name="104" logicalName="RESUME" description=" " tag=" " />
+      <S2F21Command name="105" logicalName="ABORT" description=" " tag=" " />
+      <S2F21Command name="106" logicalName="ACTIVATESIREN" description=" " tag=" " />
+      <S2F21Command name="151" logicalName="HOME_ALL" description="start machine homing" tag=" " />
     </S2F21>
     <S2F41 opcPulseTimeout="0">
-      <S2F41Command tag=" " name="StartLot" logicalName="StartLot" description=" ">
+      <S2F41Command tag=" " name="START_LOT" logicalName="START_LOT" description=" ">
         <CommandParameter tag=" " name="LOT_ID" logicalName="LOT_ID" description=" " parameterType="Ascii" />
         <CommandParameter tag=" " name="QUANTITY" logicalName="QUANTITY" description=" " parameterType="U4" />
       </S2F41Command>

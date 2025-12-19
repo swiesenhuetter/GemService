@@ -29,6 +29,9 @@
 	  <Reference Include="Insphere.Connectivity.Application.Exceptions">
 	    <HintPath>..\..\Eulitha\InSphereLibs\Insphere.Connectivity.Application.Exceptions.dll</HintPath>
 	  </Reference>
+	  <Reference Include="Insphere.Connectivity.Application.MessageServices">
+	    <HintPath>..\..\Eulitha\InSphereLibs\Insphere.Connectivity.Application.MessageServices.dll</HintPath>
+	  </Reference>
 	  <Reference Include="Insphere.Connectivity.Common">
 	    <HintPath>..\..\Eulitha\InSphereLibs\Insphere.Connectivity.Common.dll</HintPath>
 	  </Reference>
