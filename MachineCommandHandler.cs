@@ -1,0 +1,135 @@
+﻿using Insphere.Connectivity.Application.Common;
+using Insphere.Connectivity.Application.SecsToHost;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+
+
+namespace GemService
+{
+    internal class MachineCommandHandler
+    {
+        private GEMController _gem_ctrl;
+        private readonly ILogger<MachineCommandHandler> _logger;
+
+        public MachineCommandHandler(ILogger<MachineCommandHandler> logger, GEMController gemController)
+        {
+            _gem_ctrl = gemController;
+            _logger = logger;
+        }
+
+        public void Dispatch(string json_command_txt)
+        {
+            using JsonDocument doc = JsonDocument.Parse(json_command_txt);
+            JsonElement root = doc.RootElement;
+
+            // Extract method name
+            if (!root.TryGetProperty("method", out JsonElement methodElement))
+            {
+                _logger.LogError("Missing 'method' property in command: {json}", json_command_txt);
+                return;
+            }
+
+            if (methodElement.ValueKind != JsonValueKind.String)
+            {
+                _logger.LogError("Invalid 'method' property type in command: {json}", json_command_txt);
+                return;
+            }
+
+            string? methodName = methodElement.GetString();
+            if (string.IsNullOrEmpty(methodName))
+            {
+                _logger.LogError("Invalid method name in command: {json}", json_command_txt);
+                return;
+            }
+            else 
+            {
+                _logger.LogInformation("Dispatching command: {method}", methodName);
+            }
+
+            var my_type = this.GetType();
+            var method = my_type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+            if (method != null)
+                {
+                // Extract parameters if they exist rest of the Dictionary are parameters
+                // Get method parameters info
+                var methodParams = method.GetParameters();
+                var parameters = new object[methodParams.Length];
+
+                // Extract all properties except "method" from JSON
+                for (int i = 0; i < methodParams.Length; i++)
+                {
+                    var paramInfo = methodParams[i];
+                    string paramName = paramInfo.Name ?? string.Empty;
+
+                    // Try to find the parameter in the JSON
+                    if (root.TryGetProperty(paramName, out JsonElement paramElement))
+                    {
+                        // Convert JsonElement to the expected parameter type
+                        parameters[i] = ConvertJsonElementToType(paramElement, paramInfo.ParameterType);
+                    }
+                    else
+                    {
+                        // Use default value if parameter not found
+                        if (paramInfo.HasDefaultValue)
+                        {
+                            parameters[i] = paramInfo.DefaultValue!;
+                        }
+                        else
+                        {
+                            _logger.LogError("Required parameter '{param}' not found for method '{method}'", paramName, methodName);
+                            return;
+                        }
+                    }
+                }
+
+                method.Invoke(this, parameters);
+            }
+
+        }
+
+        private void Connect(string device, string version)
+        {
+            _logger.LogInformation("Device {device} version:{version}", device, version);
+        }
+
+        private void LaserOn(bool on)
+        {
+            _logger.LogInformation("Laser On: {}", on);
+            _gem_ctrl.SetAttribute("LaserState", AttributeType.DV, on ? "ON" : "OFF");
+            _gem_ctrl.SendCollectionEvent("LaserStateChanged");
+        }
+
+        private object ConvertJsonElementToType(JsonElement element, Type targetType)
+        {
+            try
+            {
+                // Handle nullable types
+                var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+
+                return underlyingType.Name switch
+                {
+                    nameof(String) => element.GetString() ?? string.Empty,
+                    nameof(Int32) => element.GetInt32(),
+                    nameof(Int64) => element.GetInt64(),
+                    nameof(Double) => element.GetDouble(),
+                    nameof(Boolean) => element.GetBoolean(),
+                    nameof(Decimal) => element.GetDecimal(),
+                    nameof(DateTime) => element.GetDateTime(),
+                    _ => JsonSerializer.Deserialize(element.GetRawText(), targetType) ?? throw new InvalidOperationException($"Cannot convert to type {targetType.Name}")
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to convert JSON element to type {type}", targetType.Name);
+                throw;
+            }
+        }
+
+    }
+}

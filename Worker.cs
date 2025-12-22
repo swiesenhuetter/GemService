@@ -19,13 +19,17 @@ namespace GemService
         private TcpClient? _gemEquipmentClient;
         private MessageServiceManager? _serviceManager;
         private readonly HostCommandHandler _hostCommandHandler;
+        private readonly MachineCommandHandler _machineCommandHandler;
 
-        public Worker(ILogger<Worker> logger, IOptions<WorkerOptions> options)
+        public Worker(ILogger<Worker> logger, IOptions<WorkerOptions> options, ILoggerFactory loggerFactory)
         {
             _logger = logger;
             _options = options.Value;
             _gem_ctrl = new GEMController();
             _hostCommandHandler = new HostCommandHandler();
+
+            var machineLogger = loggerFactory.CreateLogger<MachineCommandHandler>();
+            _machineCommandHandler = new MachineCommandHandler(machineLogger, gemController: _gem_ctrl);
             // Copy EulithaPhableX.xml to eulitha folder : C:\ProgramData\Eulitha
             CopyConfigurationFile();
 
@@ -244,6 +248,9 @@ namespace GemService
                         break;
                     }
                     _logger.LogInformation("Received TCP message: {msg}", msg);
+                    
+                    _machineCommandHandler.Dispatch(msg);
+
                     char[] four_bytes = new char[] { 'A', 'C', 'K', '\0' };
                     await writer.WriteAsync(four_bytes, 0, 4);
                 }
