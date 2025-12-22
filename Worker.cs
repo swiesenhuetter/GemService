@@ -7,6 +7,7 @@ using Insphere.Connectivity.Application.SecsToHost;
 using Insphere.Connectivity.Application.Common;
 using Insphere.Connectivity.Application.MessageServices;
 using Insphere.Connectivity.Common;
+using Insphere.Connectivity.Application.Exceptions;
 
 namespace GemService
 {
@@ -15,14 +16,16 @@ namespace GemService
         private readonly ILogger<Worker> _logger;
         private readonly WorkerOptions _options;
         private GEMController _gem_ctrl;
+        private TcpClient? _gemEquipmentClient;
         private MessageServiceManager? _serviceManager;
+        private readonly HostCommandHandler _hostCommandHandler;
 
         public Worker(ILogger<Worker> logger, IOptions<WorkerOptions> options)
         {
             _logger = logger;
             _options = options.Value;
             _gem_ctrl = new GEMController();
-
+            _hostCommandHandler = new HostCommandHandler();
             // Copy EulithaPhableX.xml to eulitha folder : C:\ProgramData\Eulitha
             CopyConfigurationFile();
 
@@ -97,13 +100,18 @@ namespace GemService
         {
             string cmd = e.LogicalName;
 
+            // args is empthy dictionary for now 
+            var empty_dict = new Dictionary<string, CommandParameterEx>();
+            _hostCommandHandler.Dispatch(cmd, empty_dict);
             e.SetReply(CMDA.Accepted);
         }
 
         private void OnHostCommandReceived(Object sender, HostCommandEventArgs<HCACK> e)
         {
             string cmd = e.LogicalName;
-            
+
+            _hostCommandHandler.Dispatch(cmd, e.Parameters);
+
             _logger.LogInformation("received : {cmd}", cmd);
             e.SetReply(HCACK.Accepted);
         }
@@ -141,8 +149,6 @@ namespace GemService
             {
                 // Expected during shutdown
             }
-
-
         }
 
         private async Task RunTcpServer(CancellationToken stoppingToken)
@@ -156,6 +162,9 @@ namespace GemService
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var client = await listener.AcceptTcpClientAsync(stoppingToken);
+                    _gemEquipmentClient = client;  // Store the GemEquipment client
+                    _hostCommandHandler.SetTcpClient(_gemEquipmentClient);
+                    _logger.LogInformation("GemEquipment client connected");
                     _ = HandleTcpClient(client, stoppingToken); // Fire and forget
                 }
             }
@@ -175,6 +184,8 @@ namespace GemService
             finally
             {
                 listener.Stop();
+                _gemEquipmentClient?.Close();
+                _gemEquipmentClient = null;
             }
         }
 
