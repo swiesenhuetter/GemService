@@ -1,4 +1,4 @@
-﻿using Insphere.Connectivity.Application.Common;
+using Insphere.Connectivity.Application.Common;
 using Insphere.Connectivity.Application.SecsToHost;
 using System;
 using System.Collections.Generic;
@@ -95,7 +95,10 @@ namespace GemService
 
         private void Connect(string device, string version)
         {
-            _logger.LogInformation("Device {device} version:{version}", device, version);
+            _logger.LogInformation("Started Device {device} version:{version}", device, version);
+            string msg = $"Connected: {device}_V{version}";
+            _gem_ctrl.SetAttribute("ToolStatus", AttributeType.SV, msg);
+            _gem_ctrl.SendCollectionEvent("MachineStatusChange");
         }
 
         private void LaserOn(bool on)
