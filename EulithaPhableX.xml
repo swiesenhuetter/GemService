@@ -2,7 +2,7 @@
 <Equipment xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" persistence="true" asciiEncoding="Standard" schemaVersion="1.0.4" schemaTemplate="GEM30" productInfo="SecsToHost.Net Compatible">
   <License licenseId="" licensePath="" />
   <Nameable id="MyEquipment" description="Eulitha Machine" locator="To be described" alias="Phable X" make="Eulitha AG" model="PhableX" softwareRev="1.0.1" />
-  <GemConnection protocol="Hsms" defaultCommunicationState="Enabled" defaultControlState="Online" defaultOnlineSubState="Remote" defaultOnlineFailState="HostOffline" deviceId="0" multipleOpen="false" maxOpenTransactions="10">
+  <GemConnection protocol="Hsms" defaultCommunicationState="Disabled" defaultControlState="Online" defaultOnlineSubState="Remote" defaultOnlineFailState="HostOffline" deviceId="0" multipleOpen="false" maxOpenTransactions="10">
     <HSMS connectionMode="Passive" linktestInterval="60" localIPAddress="127.0.0.1" localPortNumber="5000" remoteIPAddress="127.0.0.1" remotePortNumber="6000" T3Timeout="45" T5Timeout="10" T6Timeout="5" T7Timeout="10" T8Timeout="5" />
     <RS232 commPort="1" baudRate="9600" retry="3" t1="1" t2="10" t3="30" t4="10" linktestInterval="60" T1Timeout="0.5" T2Timeout="10" T3Timeout="45" T4Timeout="45" />
   </GemConnection>

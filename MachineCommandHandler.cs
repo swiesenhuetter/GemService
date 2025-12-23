@@ -96,9 +96,13 @@ namespace GemService
         private void Connect(string device, string version)
         {
             _logger.LogInformation("Started Device {device} version:{version}", device, version);
-            string msg = $"Connected: {device}_V{version}";
-            _gem_ctrl.SetAttribute("ToolStatus", AttributeType.SV, msg);
-            _gem_ctrl.SendCollectionEvent("MachineStatusChange");
+            _gem_ctrl.SetEnable();
+        }
+
+        private void Disconnect()
+        {
+            _logger.LogInformation("Disconnected PhableX Device");
+            _gem_ctrl.SetDisable();
         }
 
         private void LaserOn(bool on)

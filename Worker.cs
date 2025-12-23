@@ -270,6 +270,10 @@ namespace GemService
             }
             finally
             {
+                if (_gem_ctrl.CommunicationState == CommunicationState.Enabled)
+                {
+                    _gem_ctrl.SetDisable();
+                }
                 client.Close();
             }
         }
