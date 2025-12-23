@@ -1,5 +1,6 @@
 using Insphere.Connectivity.Application.Common;
 using Insphere.Connectivity.Application.SecsToHost;
+using Insphere.Connectivity.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,11 +113,8 @@ namespace GemService
         private void LaserOn(bool on)
         {
             _logger.LogInformation("Laser On: {on}", on);
-
-            string laser_txt = on ? "1" : "False";
-            
+            string laser_txt = on ? "1" : "0";
             _gem_ctrl.SetAttribute("LaserOnIndicator", AttributeType.SV, laser_txt);
-
             if (on)
             {
                 _gem_ctrl.SetAlarm("LaserOn");
@@ -141,6 +139,32 @@ namespace GemService
             _gem_ctrl.SendCollectionEvent("FrontCassetteLoaded");
         }
 
+        private void on_back_cassette_scanned(List<bool> wafer_list)
+        {
+            _logger.LogInformation("Back cassette scanned");
+            var list_data = new SECsDataItem(SECsFormat.List);
+            for (int i = 0; i < wafer_list.Count; i++)
+            {
+                bool wafer_present = wafer_list[i];
+                list_data.Add($"Slot_{i + 1}", wafer_present, SECsFormat.Boolean);
+            }
+            _gem_ctrl.SetListAttribute("BackCassetteSlots", AttributeType.SV, list_data);
+            _gem_ctrl.SendCollectionEvent("BackCassetteScanned");
+        }
+
+        private void on_front_cassette_scanned(List<Boolean> wafer_list)
+        {
+            _logger.LogInformation("Front cassette scanned");
+            var list_data = new SECsDataItem(SECsFormat.List);
+            for (int i = 0; i < wafer_list.Count; i++)
+            {
+                bool wafer_present = wafer_list[i];
+                list_data.Add($"Slot_{i + 1}", wafer_present, SECsFormat.Boolean);
+            }
+            _gem_ctrl.SetListAttribute("FrontCassetteSlots", AttributeType.SV, list_data);
+            _gem_ctrl.SendCollectionEvent("FrontCassetteScanned");
+        }
+
 
         private object ConvertJsonElementToType(JsonElement element, Type targetType)
         {
@@ -158,6 +182,8 @@ namespace GemService
                     nameof(Boolean) => element.GetBoolean(),
                     nameof(Decimal) => element.GetDecimal(),
                     nameof(DateTime) => element.GetDateTime(),
+                    nameof(List<bool>) when element.ValueKind == JsonValueKind.Array =>
+                        element.EnumerateArray().Select(e => e.GetBoolean()).ToList(),
                     _ => JsonSerializer.Deserialize(element.GetRawText(), targetType) ?? throw new InvalidOperationException($"Cannot convert to type {targetType.Name}")
                 };
             }
