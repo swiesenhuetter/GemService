@@ -55,7 +55,7 @@ namespace GemService
             var my_type = this.GetType();
             var method = my_type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
             if (method != null)
-                {
+            {
                 // Extract parameters if they exist rest of the Dictionary are parameters
                 // Get method parameters info
                 var methodParams = method.GetParameters();
@@ -90,6 +90,10 @@ namespace GemService
 
                 method.Invoke(this, parameters);
             }
+            else
+            {
+                _logger.LogWarning($"Unknown command {methodName} received");
+            }
 
         }
 
@@ -107,10 +111,36 @@ namespace GemService
 
         private void LaserOn(bool on)
         {
-            _logger.LogInformation("Laser On: {}", on);
-            _gem_ctrl.SetAttribute("LaserState", AttributeType.DV, on ? "ON" : "OFF");
-            _gem_ctrl.SendCollectionEvent("LaserStateChanged");
+            _logger.LogInformation("Laser On: {on}", on);
+
+            string laser_txt = on ? "1" : "False";
+            
+            _gem_ctrl.SetAttribute("LaserOnIndicator", AttributeType.SV, laser_txt);
+
+            if (on)
+            {
+                _gem_ctrl.SetAlarm("LaserOn");
+            }
+            else
+            {
+                _gem_ctrl.ClearAlarm("LaserOn");
+            }
         }
+
+        private void on_back_cassette_change(string cassette_id)
+        {
+            _logger.LogInformation($"Back Cassette Changed: {cassette_id}");
+            _gem_ctrl.SetAttribute("BackCassetteID", AttributeType.DV, cassette_id);
+            _gem_ctrl.SendCollectionEvent("BackCassetteLoaded");
+        }
+
+        private void on_front_cassette_change(string cassette_id)
+        {
+            _logger.LogInformation($"Front Cassette Changed: {cassette_id}");
+            _gem_ctrl.SetAttribute("FrontCassetteID", AttributeType.DV, cassette_id);
+            _gem_ctrl.SendCollectionEvent("FrontCassetteLoaded");
+        }
+
 
         private object ConvertJsonElementToType(JsonElement element, Type targetType)
         {

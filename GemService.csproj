@@ -35,6 +35,9 @@
 	  <Reference Include="Insphere.Connectivity.Common">
 	    <HintPath>..\..\Eulitha\InSphereLibs\Insphere.Connectivity.Common.dll</HintPath>
 	  </Reference>
+	  <Reference Include="Insphere.Connectivity.Common.ToolModel">
+	    <HintPath>..\..\Eulitha\InSphereLibs\Insphere.Connectivity.Common.ToolModel.dll</HintPath>
+	  </Reference>
 	  <Reference Include="Insphere.Connectivity.SecsToHost.Net">
 	    <HintPath>..\..\Eulitha\InSphereLibs\Insphere.Connectivity.SecsToHost.Net.dll</HintPath>
 	  </Reference>
