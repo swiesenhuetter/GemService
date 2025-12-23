@@ -165,6 +165,48 @@ namespace GemService
             _gem_ctrl.SendCollectionEvent("FrontCassetteScanned");
         }
 
+        private void wafer_arrived_at_station(string station_id, string wafer_id,
+            int origin_slot, int destination_slot)
+        {
+            if (origin_slot == 0)
+            {
+                _logger.LogInformation("Origin slot 0, initialization value");
+            }
+            else if (origin_slot < 0 || origin_slot > 25)
+            {
+                _logger.LogError("Invalid origin slot: {origin_slot}. Must be between 1 and 25.", origin_slot);
+            }
+            _logger.LogInformation("Wafer {wafer_id} arrived at station {station_id}", wafer_id, station_id);
+
+            _gem_ctrl.SetAttribute("StationId", AttributeType.DV, station_id);
+            _gem_ctrl.SetAttribute("ScannedWaferId", AttributeType.DV, wafer_id);
+            _gem_ctrl.SetAttribute("OriginSlot", AttributeType.DV, origin_slot.ToString());
+            _gem_ctrl.SetAttribute("DestinationSlot", AttributeType.DV, destination_slot.ToString());
+            _gem_ctrl.SendCollectionEvent("WaferArrivedAtStation");
+        }
+
+        private void ReInitialize(string eapRemoteIp, int eapPort)
+        {
+            _gem_ctrl.SetDisable();
+
+            if (!_gem_ctrl.IsInitialized)
+            {
+                _logger.LogError("GEM Controller is not initialized. Cannot reinitialize.");
+                return;
+            }
+
+            _gem_ctrl.EquipmentModel.GemConnection.HSMS.remoteIPAddress = eapRemoteIp;
+            _gem_ctrl.EquipmentModel.GemConnection.HSMS.remotePortNumber = eapPort;
+            _gem_ctrl.EquipmentModel.GemConnection.HSMS.localIPAddress = eapRemoteIp;
+            _gem_ctrl.EquipmentModel.GemConnection.HSMS.localPortNumber = eapPort;
+
+            _gem_ctrl.SaveToolModel();
+            _gem_ctrl.ReInitialize(@"C:\Temp");
+            _gem_ctrl.SetEnable();
+
+            _logger.LogInformation("GEM Controller reinitialized with IP:{eapRemoteIp} Port:{eapPort}", 
+                eapRemoteIp, eapPort);
+        }
 
         private object ConvertJsonElementToType(JsonElement element, Type targetType)
         {
