@@ -57,6 +57,8 @@ namespace GemService
 
             _gem_ctrl.PrimaryMessageIn += OnPrimaryMessage;
 
+            _gem_ctrl.RecipeDirectoryRequested += OnRecipeDirectoryRequested;
+
             InitGemController();
         }
 
@@ -82,8 +84,22 @@ namespace GemService
 
         private void OnPrimaryMessage(object sender, SECsPrimaryInEventArgs e)
         {             // Log the received primary message
-            _logger.LogInformation("Received Primary Message: {message}", e.ToString());
+            string message_id = $"S{e.Inputs.Stream}F{e.Inputs.Function}";
+            _logger.LogInformation("Received Primary Message {id}: {message}", message_id, e.ToString());
         }
+
+        private void OnRecipeDirectoryRequested(object sender, RecipeDirectoryEventArgs<List<string>> e)
+        {
+            string userHomeFolder = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+            string desktopFolder = Path.Combine(userHomeFolder, "Desktop");
+            string recipeFolder = Path.Combine(desktopFolder, "Recipes");
+            // find all rcp files in folder
+            string[] rcpFiles = Directory.GetFiles(recipeFolder, "*.rcp");
+            var recipe_list = new List<string>(rcpFiles);
+            _logger.LogInformation("Handling S7F19 message");
+            e.SetReply(recipe_list);
+        }
+
 
 
         private void OnCommunicationStateChanged(object sender, SECsEventArgs e)
