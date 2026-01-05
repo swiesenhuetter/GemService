@@ -59,6 +59,11 @@ namespace GemService
 
             _gem_ctrl.RecipeDirectoryRequested += OnRecipeDirectoryRequested;
 
+            // Subscribe to the GEM Recipe Download Inquire (S7F1)
+            _gem_ctrl.RecipeDownloadInquired += OnRecipeDownloadInquired;
+            // Subscribe to the GEM Recipe Download (S7F3) sent by Host
+            _gem_ctrl.RecipeDownloadReceived += OnRecipeDownloadReceived;
+
             InitGemController();
         }
 
@@ -80,7 +85,22 @@ namespace GemService
                 _logger.LogError(ex, "GEM Controller initialization error");
                 throw;
             }
-          }
+
+            if (!File.Exists(_options.recipeFolder))
+            {
+                try
+                {
+                    Directory.CreateDirectory(_options.recipeFolder);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error creating recipe folder at {recipeFolder}", _options.recipeFolder);
+                    throw;
+                }
+            }
+            _gem_ctrl.SetProcessProgramPath(_options.recipeFolder);
+
+        }
 
         private void OnPrimaryMessage(object sender, SECsPrimaryInEventArgs e)
         {             // Log the received primary message
@@ -90,17 +110,56 @@ namespace GemService
 
         private void OnRecipeDirectoryRequested(object sender, RecipeDirectoryEventArgs<List<string>> e)
         {
-            string userHomeFolder = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
-            string desktopFolder = Path.Combine(userHomeFolder, "Desktop");
-            string recipeFolder = Path.Combine(desktopFolder, "Recipes");
-            // find all rcp files in folder
-            string[] rcpFiles = Directory.GetFiles(recipeFolder, "*.rcp");
-            var recipe_list = new List<string>(rcpFiles);
             _logger.LogInformation("Handling S7F19 message");
+            // find all rcp files in folder
+            string[] rcpFiles = Directory.GetFiles(_options.recipeFolder, "*.rcp");
+            string[] batchFiles = Directory.GetFiles(_options.batchFolder, "*.job");
+            var recipe_list = new List<string>(rcpFiles);
+            recipe_list.AddRange(batchFiles);
             e.SetReply(recipe_list);
         }
 
+        private void OnRecipeDownloadInquired(object sender, RecipeInquireEventArgs<PPGRNT> e)
+        {
+            _logger.LogInformation("Handling S7F1 message for recipe: {recipe_name}", e.RecipeId);
+            e.SetReply(PPGRNT.AlreadyExist);
+        }
 
+        private void OnRecipeDownloadReceived(object sender, RecipeEventArgs<ACKC7> e)
+        {
+            _logger.LogInformation("Handling S7F3 message for recipe: {recipe_name}", e.RecipeId);
+
+            string recipeName = e.RecipeId;
+            SECsFormat recipeFormat = e.RecipeFormat;
+
+            if (recipeName.EndsWith(".job", StringComparison.OrdinalIgnoreCase))
+            {
+                // Batch file received
+                _logger.LogInformation("Received batch file: {recipe_name}", recipeName);
+            }
+            else
+            {
+                // Recipe file received
+                _logger.LogInformation("Received recipe file: {recipe_name}", recipeName);
+            }
+
+            if (recipeFormat == SECsFormat.Binary)
+            {
+                byte[] binPPBody = e.GetRecipeBody<byte[]>();
+                // Save recipe to file in the ProcessProgramPath
+                _gem_ctrl.SaveProcessProgramToDisk(recipeName, binPPBody);
+            }
+            else
+            {
+                string ascPPBody = e.GetRecipeBody<string>();
+                // Save recipe to file in the ProcessProgramPath
+                _gem_ctrl.SaveProcessProgramToDisk(recipeName, ascPPBody);
+            }
+
+
+
+            e.SetReply(ACKC7.Accepted);
+        }
 
         private void OnCommunicationStateChanged(object sender, SECsEventArgs e)
         {

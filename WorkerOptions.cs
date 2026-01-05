@@ -10,5 +10,20 @@
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Eulitha");
 
         public string SecsGemConfigFile => "EulithaPhableX.xml";
+
+        private string userHomeFolder => 
+            Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+        
+        public string desktopFolder => 
+            Path.Combine(userHomeFolder, "Desktop");
+
+        public string recipeFolder => 
+            Path.Combine(desktopFolder, "Recipes");
+
+        public string batchFolder => 
+            Path.Combine(recipeFolder, "Batches");
+
+
+
     }
 }
