@@ -381,7 +381,7 @@ namespace GemService
             }
             catch (EndOfStreamException) 
             {
-                _logger.LogError("Handler: TCP client disconnected");
+                _logger.LogWarning("Handler: TCP client disconnected");
             }
             catch (Exception ex)
             {

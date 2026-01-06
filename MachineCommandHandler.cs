@@ -185,6 +185,27 @@ namespace GemService
             _gem_ctrl.SendCollectionEvent("WaferArrivedAtStation");
         }
 
+        private void error_message(string msg)
+        {
+            _logger.LogInformation("Error occurred. Message: {msg}", msg);
+            _gem_ctrl.SetAttribute("ErrorMessageText", AttributeType.DV, msg);
+            _gem_ctrl.SendCollectionEvent("GenericError");
+        }
+
+        private void batch_started(string batch_name)
+        {
+            _logger.LogInformation($"Batch: \"{batch_name}\" started");
+            _gem_ctrl.SetAttribute("LotId", AttributeType.DV, batch_name);
+            _gem_ctrl.SendCollectionEvent("LotStarted");
+        }
+
+        private void set_status(string msg)
+        {
+            _logger.LogInformation($"Status change: {msg}");
+            _gem_ctrl.SetAttribute("ToolStatus", AttributeType.SV, msg);
+            _gem_ctrl.SendCollectionEvent("MachineStatusChange");
+        }
+
         private void ReInitialize(string eapRemoteIp, int eapPort)
         {
             _gem_ctrl.SetDisable();
