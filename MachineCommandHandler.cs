@@ -113,8 +113,8 @@ namespace GemService
         private void LaserOn(bool on)
         {
             _logger.LogInformation("Laser On: {on}", on);
-            string laser_txt = on ? "1" : "0";
-            _gem_ctrl.SetAttribute("LaserOnIndicator", AttributeType.SV, laser_txt);
+
+            _gem_ctrl.SetAttribute("LaserOnIndicator", AttributeType.SV, on.ToString());
             if (on)
             {
                 _gem_ctrl.SetAlarm("LaserOn");

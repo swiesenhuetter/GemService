@@ -57,12 +57,16 @@ namespace GemService
 
             _gem_ctrl.PrimaryMessageIn += OnPrimaryMessage;
 
+            // host asks for content of desktop/Recipes folder followed by Recipes/Batches
             _gem_ctrl.RecipeDirectoryRequested += OnRecipeDirectoryRequested;
 
-            // Subscribe to the GEM Recipe Download Inquire (S7F1)
+            // Subscribe to host Recipe Download Inquire (S7F1)
             _gem_ctrl.RecipeDownloadInquired += OnRecipeDownloadInquired;
-            // Subscribe to the GEM Recipe Download (S7F3) sent by Host
+            // Subscribe to the GEM Recipe Download (S7F3) Host sends recipe to Equipment
             _gem_ctrl.RecipeDownloadReceived += OnRecipeDownloadReceived;
+
+            // Subscribe to the Host Recipe Upload Request (S7F5)
+            _gem_ctrl.RecipeUploadRequested += OnRecipeUploadRequested;
 
             InitGemController();
         }
@@ -136,11 +140,13 @@ namespace GemService
             {
                 // Batch file received
                 _logger.LogInformation("Received batch file: {recipe_name}", recipeName);
+                _gem_ctrl.SetProcessProgramPath(_options.batchFolder);
             }
             else
             {
                 // Recipe file received
                 _logger.LogInformation("Received recipe file: {recipe_name}", recipeName);
+                _gem_ctrl.SetProcessProgramPath(_options.recipeFolder);
             }
 
             if (recipeFormat == SECsFormat.Binary)
@@ -155,10 +161,48 @@ namespace GemService
                 // Save recipe to file in the ProcessProgramPath
                 _gem_ctrl.SaveProcessProgramToDisk(recipeName, ascPPBody);
             }
-
-
-
             e.SetReply(ACKC7.Accepted);
+        }
+
+        private void OnRecipeUploadRequested(object sender, RecipeUploadEventArgs<RecipeObject> e)
+        {
+            _logger.LogInformation("Handling S7F5 message for recipe: {recipe_name}", e.RecipeId);
+            string recipeName = e.RecipeId;
+
+            string filename = string.Empty;
+
+            if (recipeName.EndsWith(".job", StringComparison.OrdinalIgnoreCase))
+            {
+                // Batch file requested
+                _logger.LogInformation("Received batch file: {recipe_name}", recipeName);
+                filename = Path.Combine(_options.batchFolder, recipeName);
+            }
+            else
+            {
+                // Recipe file requested
+                _logger.LogInformation("Received recipe file: {recipe_name}", recipeName);
+                filename = Path.Combine(_options.recipeFolder, recipeName);
+            }
+
+            RecipeObject recipe = new RecipeObject();
+            recipe.RecipeId = recipeName;
+
+            try
+            {
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                BinaryReader r = new BinaryReader(fs);
+                byte[] ppbody = r.ReadBytes((int)fs.Length);
+                recipe.SetValue<byte[]>(ppbody);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error reading recipe file: {filename}", filename);
+                e.SetReply(recipe); // empty recipe
+                return;
+            }
+
+            e.SetReply(recipe);
         }
 
         private void OnCommunicationStateChanged(object sender, SECsEventArgs e)
