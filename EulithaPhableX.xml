@@ -21,9 +21,8 @@
       <S2F21Command name="151" logicalName="HOME_ALL" description="start machine homing" tag=" " />
     </S2F21>
     <S2F41 opcPulseTimeout="0">
-      <S2F41Command tag=" " name="START_LOT" logicalName="START_LOT" description=" ">
-        <CommandParameter tag=" " name="LOT_ID" logicalName="LOT_ID" description=" " parameterType="Ascii" />
-        <CommandParameter tag=" " name="QUANTITY" logicalName="QUANTITY" description=" " parameterType="U4" />
+      <S2F41Command tag=" " name="StartBatch" logicalName="StartBatch" description=" ">
+        <CommandParameter tag=" " name="BatchName" logicalName="BatchName" description=" " parameterType="Ascii" />
       </S2F41Command>
       <S2F41Command tag=" " name="VERIFY_RECIPE" logicalName="VERIFY_RECIPE" description=" ">
         <CommandParameter tag=" " name="RecipeName" logicalName="RecipeName" description="File name in recipes folder include extension (.rcp)" parameterType="Ascii" />

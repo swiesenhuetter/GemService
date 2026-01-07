@@ -12,9 +12,11 @@ namespace GemService
     public class HostCommandHandler
     {
         private TcpClient? _tcpClient;
+        private readonly ILogger<HostCommandHandler> _logger;
 
-        public HostCommandHandler()
+        public HostCommandHandler(ILogger<HostCommandHandler> logger)
         {
+            _logger = logger;
         }
 
         public void SetTcpClient(TcpClient? client)
@@ -75,13 +77,19 @@ namespace GemService
 
         private void Reset(Dictionary<string, object> parameters) 
         {
-            /* Implementation */ 
+            _logger.LogInformation("Received Reset command from EAP host");
         }
 
         private void HomeAll(Dictionary<string, object> parameters) 
-        { 
-            /* Implementation */ 
+        {
+            _logger.LogInformation("Received Homing command from EAP host");
         }
+
+        private void StartBatch(string BatchId)
+        {
+            _logger.LogInformation($"Starting batch with ID: {BatchId}");
+        }
+
 
         private Dictionary<string, object> TranslateParams(Dictionary<string, CommandParameterEx> secs_params)
         {

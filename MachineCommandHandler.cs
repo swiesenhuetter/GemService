@@ -206,6 +206,17 @@ namespace GemService
             _gem_ctrl.SendCollectionEvent("MachineStatusChange");
         }
 
+
+        private void BatchFinished(string batch_name, int num_wafers, int batch_status)
+        {
+            _logger.LogInformation("Batch Finished: {batch_name} with {num_wafers} wafers, status: {batch_status}",
+                batch_name, num_wafers, batch_status); 
+            _gem_ctrl.SetAttribute("LotId", AttributeType.DV, batch_name);
+            _gem_ctrl.SetAttribute("LotProcessedQty", AttributeType.DV, num_wafers.ToString());
+            _gem_ctrl.SetAttribute("BatchStatus", AttributeType.SV, batch_status.ToString());
+            _gem_ctrl.SendCollectionEvent("LotCompleted");
+        }
+
         private void ReInitialize(string eapRemoteIp, int eapPort)
         {
             _gem_ctrl.SetDisable();

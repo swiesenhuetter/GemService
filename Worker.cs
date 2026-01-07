@@ -26,7 +26,8 @@ namespace GemService
             _logger = logger;
             _options = options.Value;
             _gem_ctrl = new GEMController();
-            _hostCommandHandler = new HostCommandHandler();
+            var hostLogger = loggerFactory.CreateLogger<HostCommandHandler>();
+            _hostCommandHandler = new HostCommandHandler(hostLogger);
 
             var machineLogger = loggerFactory.CreateLogger<MachineCommandHandler>();
             _machineCommandHandler = new MachineCommandHandler(machineLogger, gemController: _gem_ctrl);
@@ -219,6 +220,16 @@ namespace GemService
             _logger.LogInformation("received : {ctrl_state}", ctrl_state);
         }
 
+        /// <summary>
+        /// Handles S2F21 (Remote Command) - Simple commands without parameters from the GEM host.
+        /// </summary>
+        /// <param name="sender">The event sender</param>
+        /// <param name="e">Event arguments containing the command name and reply mechanism</param>
+        /// <remarks>
+        /// S2F21 is used for simple remote commands that do not require parameters.
+        /// The command is dispatched to the HostCommandHandler and an acceptance reply is sent back to the host.
+        /// dispatch will sent the command to the PhableX via TCP (in json format).
+        /// </remarks>
         private void OnRemoteCommandReceived(object sender, RemoteCommandEventArgs<CMDA> e)
         {
             string cmd = e.LogicalName;
@@ -389,10 +400,7 @@ namespace GemService
             }
             finally
             {
-                if (_gem_ctrl.CommunicationState == CommunicationState.Enabled)
-                {
-                    _gem_ctrl.SetDisable();
-                }
+                _gem_ctrl.SetDisable();
                 client.Close();
             }
         }
